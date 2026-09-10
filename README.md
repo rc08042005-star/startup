@@ -18,7 +18,7 @@ Kaiwa is a text-focused communication platform for sharing thoughts, research, a
 ### Design
 [Made with Word]
 ![Kaiwa-Design](kaiwa-design.png) 
-![Kaiwa-Design](design1.png)
+
 
 [Made with Figma]
 ![Kaiwa-Design](login.png) 
@@ -57,11 +57,11 @@ I am going to use the required technologies in the following ways.
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] I completed the prerequisites for this deliverable (Git commit requirement)
-- [ x] Proper use of Markdown
-- [x ] A concise and compelling elevator pitch
-- [ x] Description of key features
-- [x ] Description of how you will use each technology including your 3rd party API and use of WebSocket
-- [ x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [x] Proper use of Markdown
+- [x] A concise and compelling elevator pitch
+- [x] Description of key features
+- [x] Description of how you will use each technology including your 3rd party API and use of WebSocket
+- [x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ## 🚀 AWS deliverable
 
