@@ -16,7 +16,8 @@ Kaiwa is a platform focused on communication through writing and discussion. Use
 
 ### Design
 
-![Kaiwa-Design](kaiwa-design.png)
+![Kaiwa-Design](login.png) 
+(page.png)
 
 The design will show the basic layout of Kaiwa, including the login page, home feed, post creation area, and user profile. The goal is to keep the interface simple and focused on reading, writing, and interacting with text-based content.
 
