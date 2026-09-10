@@ -18,7 +18,7 @@ Kaiwa is a platform focused on communication through writing and discussion. Use
 
 ![Kaiwa-Design](kaiwa-design.png)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The design will show the basic layout of Kaiwa, including the login page, home feed, post creation area, and user profile. The goal is to keep the interface simple and focused on reading, writing, and interacting with text-based content.
 
 ```mermaid
 sequenceDiagram
