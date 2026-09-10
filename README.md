@@ -1,8 +1,8 @@
-# Your startup name here
+# Kaiwa
 
 [My Notes](notes.md)
 
-A brief description of the application here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+I will be working on making a app for sharing photos, videos, blogs and sending text to each other basically like a twitter but I am naming it 'Kaiwa' which is the japanese term for conversation or dialogue. I will try to make this app more like sharing notes, thoughts, blogs , articles, news and publishments. It will also carry on basic communications through chat services.But just limiting it to basic chats because this app will be more focused towards the artcile, tweets, researchs, news and so on.
 
 > [!NOTE]
 > This is a template for your startup application. You must modify this `README.md` file for each phase of your development. You only need to fill in the section for each deliverable when that deliverable is submitted in Canvas. Without completing the section for a deliverable, the TA will not know what to look for when grading your submission. Feel free to add additional information to each deliverable description, but make sure you at least have the list of rubric items and a description of what you did for each item.
@@ -12,11 +12,11 @@ A brief description of the application here. Lorem ipsum dolor sit amet, consect
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+I think people would want to lean towards 'Kaiwa' for not just the communication but for communication through presentation. People can write their opinion and share their thoughts , research, publishments, articles in this app and they can get feedbacks and comments on their post. I would like to say Kaiwa will be like twitter a little bit but more posts on this will be likely for educational purposes. AND importantly it won't have advanced features like sharing video, audio, photo or more but it will basically be a lot of texts , more like discussions.
 
 ### Design
 
-![Design image](placeholder.png)
+![Kaiwa-Design](kaiwa-design.png)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
