@@ -2,7 +2,7 @@
 
 [My Notes](notes.md)
 
-I will be working on making a app for sharing photos, videos, blogs and sending text to each other basically like a twitter but I am naming it 'Kaiwa' which is the japanese term for conversation or dialogue. I will try to make this app more like sharing notes, thoughts, blogs , articles, news and publishments. It will also carry on basic communications through chat services.But just limiting it to basic chats because this app will be more focused towards the artcile, tweets, researchs, news and so on.
+Kaiwa is a text-focused communication platform where users can share thoughts, opinions, research, articles, and educational discussions. The application is designed to encourage meaningful written communication rather than focusing on media-heavy features such as videos, audio, or photo sharing.
 
 > [!NOTE]
 > This is a template for your startup application. You must modify this `README.md` file for each phase of your development. You only need to fill in the section for each deliverable when that deliverable is submitted in Canvas. Without completing the section for a deliverable, the TA will not know what to look for when grading your submission. Feel free to add additional information to each deliverable description, but make sure you at least have the list of rubric items and a description of what you did for each item.
@@ -12,7 +12,7 @@ I will be working on making a app for sharing photos, videos, blogs and sending 
 
 ### Elevator pitch
 
-I think people would want to lean towards 'Kaiwa' for not just the communication but for communication through presentation. People can write their opinion and share their thoughts , research, publishments, articles in this app and they can get feedbacks and comments on their post. I would like to say Kaiwa will be like twitter a little bit but more posts on this will be likely for educational purposes. AND importantly it won't have advanced features like sharing video, audio, photo or more but it will basically be a lot of texts , more like discussions.
+Kaiwa is a platform focused on communication through writing and discussion. Users can share their opinions, thoughts, research, articles, and other educational content while receiving feedback and comments from others. Kaiwa will be somewhat similar to Twitter, but with a stronger focus on educational and meaningful discussions. Instead of focusing on advanced media features such as sharing videos, audio, or photos, Kaiwa will primarily focus on text-based posts, articles, and conversations.
 
 ### Design
 
