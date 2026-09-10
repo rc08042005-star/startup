@@ -10,9 +10,10 @@ Kaiwa is a text-focused communication platform where users can share thoughts, o
 > [!NOTE]
 > If you are not familiar with Markdown then you should review the [documentation](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) before continuing.
 
+
 ### Elevator pitch
 
-Kaiwa is a platform focused on communication through writing and discussion. Users can share their opinions, thoughts, research, articles, and other educational content while receiving feedback and comments from others. Kaiwa will be somewhat similar to Twitter, but with a stronger focus on educational and meaningful discussions. Instead of focusing on advanced media features such as sharing videos, audio, or photos, Kaiwa will primarily focus on text-based posts, articles, and conversations.
+Kaiwa is a text-focused communication platform for sharing thoughts, research, articles, and educational discussions. Users can publish written content, respond to others, and participate in meaningful conversations. Unlike media-heavy social platforms, Kaiwa focuses primarily on writing, discussion, and learning.
 
 ### Design
 [Previous]
