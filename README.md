@@ -39,7 +39,7 @@ I am going to use the required technologies in the following ways.
 - **HTML** - HTML will be used to create the structure of Kaiwa, including the login page, navigation, feed, posts, profile pages, and forms.
 - **CSS** - CSS will be used to style the application and make the layout clean, readable, responsive, and visually appealing on different screen sizes.
 - **React** -React will be used to create reusable components such as the login form, post cards, navigation, profile sections, and post creation forms. React routing will also be used to move between different views of the application.
-- **Service** - A backend service will provide endpoints for registering users, logging in, logging out, creating posts, retrieving posts, and managing comments. Kaiwa will also use a third-party API such as the Quotable API to display a quote or discussion prompt that can encourage users to start a discussion.application.
+- **Service** - git  A backend service will provide endpoints for registering users, logging in, logging out, creating posts, retrieving posts, and managing comments. Kaiwa will also use the [DummyJSON Quotes API](https://dummyjson.com/docs/quotes) as a third-party API to retrieve random quotes that can be displayed as discussion prompts for users.
 - **DB/Login** - A database will store user account information, posts, comments, and profile data. Login and authentication will be used so that users can securely access their accounts and create or interact with content.
 
 - **WebSocket** - WebSocket will be used to send real-time updates from the server to connected users. For example, when a new post or comment is created, other users can see the update without refreshing the page.
