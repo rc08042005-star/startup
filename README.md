@@ -16,15 +16,15 @@ Kaiwa is a text-focused communication platform where users can share thoughts, o
 Kaiwa is a text-focused communication platform for sharing thoughts, research, articles, and educational discussions. Users can publish written content, respond to others, and participate in meaningful conversations. Unlike media-heavy social platforms, Kaiwa focuses primarily on writing, discussion, and learning.
 
 ### Design
-[Previous]
+[Made with Word]
 ![Kaiwa-Design](kaiwa-design.png) 
 ![Kaiwa-Design](design1.png)
 
-[New Made with Figma]
+[Made with Figma]
 ![Kaiwa-Design](login.png) 
 ![Kaiwa-Design](page.png)
 
-The design will show the basic layout of Kaiwa, including the login page, home feed, post creation area, and user profile. The goal is to keep the interface simple and focused on reading, writing, and interacting with text-based content.
+The design shows the basic layout of Kaiwa, including the login page, home feed, post creation area, and user profile. The goal is to keep the interface simple and focused on reading, writing, and interacting with text-based content.
 
 
 
@@ -56,7 +56,7 @@ I am going to use the required technologies in the following ways.
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [] I completed the prerequisites for this deliverable (Git commit requirement)
+- [x] I completed the prerequisites for this deliverable (Git commit requirement)
 - [ x] Proper use of Markdown
 - [x ] A concise and compelling elevator pitch
 - [ x] Description of key features
