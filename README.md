@@ -15,7 +15,11 @@ Kaiwa is a text-focused communication platform where users can share thoughts, o
 Kaiwa is a platform focused on communication through writing and discussion. Users can share their opinions, thoughts, research, articles, and other educational content while receiving feedback and comments from others. Kaiwa will be somewhat similar to Twitter, but with a stronger focus on educational and meaningful discussions. Instead of focusing on advanced media features such as sharing videos, audio, or photos, Kaiwa will primarily focus on text-based posts, articles, and conversations.
 
 ### Design
+[Previous]
+![Kaiwa-Design](kaiwa-design.png) 
+![Kaiwa-Design](design1.png)
 
+[New Made with Figma]
 ![Kaiwa-Design](login.png) 
 ![Kaiwa-Design](page.png)
 
@@ -39,7 +43,7 @@ I am going to use the required technologies in the following ways.
 - **HTML** - HTML will be used to create the structure of Kaiwa, including the login page, navigation, feed, posts, profile pages, and forms.
 - **CSS** - CSS will be used to style the application and make the layout clean, readable, responsive, and visually appealing on different screen sizes.
 - **React** -React will be used to create reusable components such as the login form, post cards, navigation, profile sections, and post creation forms. React routing will also be used to move between different views of the application.
-- **Service** - git  A backend service will provide endpoints for registering users, logging in, logging out, creating posts, retrieving posts, and managing comments. Kaiwa will also use the [DummyJSON Quotes API](https://dummyjson.com/docs/quotes) as a third-party API to retrieve random quotes that can be displayed as discussion prompts for users.
+- **Service** -  A backend service will provide endpoints for registering users, logging in, logging out, creating posts, retrieving posts, and managing comments. Kaiwa will also use the [DummyJSON Quotes API](https://dummyjson.com/docs/quotes) as a third-party API to retrieve random quotes that can be displayed as discussion prompts for users.
 - **DB/Login** - A database will store user account information, posts, comments, and profile data. Login and authentication will be used so that users can securely access their accounts and create or interact with content.
 
 - **WebSocket** - WebSocket will be used to send real-time updates from the server to connected users. For example, when a new post or comment is created, other users can see the update without refreshing the page.
@@ -51,12 +55,12 @@ I am going to use the required technologies in the following ways.
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Git commit requirement)
-- [ ] Proper use of Markdown
-- [ ] A concise and compelling elevator pitch
-- [ ] Description of key features
-- [ ] Description of how you will use each technology including your 3rd party API and use of WebSocket
-- [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [] I completed the prerequisites for this deliverable (Git commit requirement)
+- [ x] Proper use of Markdown
+- [x ] A concise and compelling elevator pitch
+- [ x] Description of key features
+- [x ] Description of how you will use each technology including your 3rd party API and use of WebSocket
+- [ x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ## 🚀 AWS deliverable
 
