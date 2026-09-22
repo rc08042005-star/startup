@@ -14,12 +14,57 @@
     
 
     <nav>
-        <a href="index.html">Home</a>
+        <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="feed.html">Feed</a></li>
+
+        </ul>
+                
     </nav>
     
         <main>
-            <h2>Welcome to Kaiwa</h2>
-            <p>A place to share your thoughts and ideas</p>
+            <section>
+                <h2>Welcome to Kaiwa</h2>
+                <p>Kaiwa is a place to share your thoughts, publish
+                articles, discover ideas, and connect with others.</p>
+                <img
+                 src="placeholder.png" 
+                alt="Kaiwa illustration"
+                width="300">
+            </section>
+
+            <section>
+                <form action="feed.html"  method="get">
+                    <label for="username">UserName</label> <br>
+                    <input 
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter Your UserName Here"
+                    required
+                    >
+                    <br><br>
+                    <label for="password">Password</label>
+                    <input 
+                    type="password"
+                    id="password"
+                    placeholder="Enter Your Password"
+                    name="password"
+                    required
+                    
+                    >
+                    <br><br>
+                    <button type="submit">Log In</button>
+                    <button type="button">Create Account(Coming soon)</button>
+
+                      <p>
+                Demo only: submitting the form opens the feed.
+                No account is created and no password is verified.
+            </p>
+
+                </form>
+            </section>
         </main>
 
 
