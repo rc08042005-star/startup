@@ -76,15 +76,18 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **HTML pages** - I did not complete this part of the deliverable.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [ ] **Links** - I did not complete this part of the deliverable.
-- [ ] **Text** - I did not complete this part of the deliverable.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [ ] **Images** - I did not complete this part of the deliverable.
-- [ ] **Login placeholder** - I did not complete this part of the deliverable.
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [x] **HTML pages** - I created `index.html` for the homepage and login, `feed.html` for posts and activity, and `profile.html` for user information and posts.
+- [x] **Proper HTML element usage** - I used semantic elements including `header`, `nav`, `main`, `section`, `article`, and `footer`, along with forms, labels, inputs, and buttons.
+- [x] **Links** - I added navigation links between Home, Feed, and Profile, plus a link to my GitHub repository.
+- [x] **Text** - I added a description of Kaiwa, profile information, sample posts, and    explanatory text for upcoming features.
+- [x] **3rd party API placeholder** - I added a Daily Quote section to the feed where a future third-party API will provide quotes.
+- [x] **Images** - I added `placeholder.png` to the homepage, feed, and profile page.
+
+- [x] **Login placeholder** - I added username and password inputs and login and create-account buttons. The feed displays a demo username.
+
+- [x] **DB data placeholder** - I added example posts to the feed and profile to represent content that will eventually be stored in a database.
+
+- [x] **WebSocket placeholder** - I added a Live Activity section showing example notifications that will eventually update in real time.
 
 ## 🚀 CSS deliverable
 
