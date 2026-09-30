@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 *{
     box-sizing: border-box;
 }
@@ -138,6 +139,9 @@ footer a{
     color: white;
 }
 
+#create-post {
+    border-left: 5px solid #2563eb;
+}
 @media (max-width:600px) {
     main{
         padding: 15px;
