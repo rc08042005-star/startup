@@ -108,16 +108,14 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Use of an imported font** - I imported and used the Inter font from Google Fonts.
 
 - [x] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I used element selectors such as `body` and `section`, class selectors such as `.profile` and `.post`, the `#create-post` ID selector, and pseudo selectors such as `:hover` and `:focus`.
-
 ## 🚀 React part 1: Routing deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Bundled using Vite** - I did not complete this part of the deliverable.
-- [ ] **Components** - I did not complete this part of the deliverable.
-- [ ] **Router** - I did not complete this part of the deliverable.
-
+- [x] **Prerequisites** - I converted Simon to React and pushed my code to GitHub. Deployment still needs to be verified.
+- [x] **Bundled using Vite** - I converted my Kaiwa website into a React application using Vite. I can run it locally using `npm run dev` and build it using `npm run build`.
+- [x] **Components** - I created separate React components for Home, Feed, and Profile. I also used App.jsx to organize the application and kept my original website design.
+- [x] **Router** - I implemented React Router to navigate between the Home, Feed, and Profile pages without reloading the entire website.
 ## 🚀 React part 2: Reactivity deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
