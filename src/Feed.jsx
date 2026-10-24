@@ -1,39 +1,6 @@
 
 import { useState, useEffect } from 'react';
 
-const starterPosts = [
-  {
-    id: 'starter-1',
-    title: 'My First Post',
-    author: 'rahul876',
-    content:
-      'The first day at BYU felt like a breeze in the ocean, with fresh energy and excitement around the university.',
-    image: '',
-    likes: [],
-    comments: [],
-  },
-  {
-    id: 'starter-2',
-    title: 'SUN AND MOON DANCE',
-    author: 'Chris_landscop',
-    content:
-      'The Sun is the brightness in the world, but when night falls the smallest borrowed light from the moon shines beautifully too.',
-    image: '/placeholder.png',
-    likes: [],
-    comments: [],
-  },
-  {
-    id: 'starter-3',
-    title: 'Politics',
-    author: 'Sameer_lander',
-    content:
-      'The politics of stealing marks from teachers when one student does good on their own can be hurtful to students who have practiced and tried more.',
-    image: '/placeholder.png',
-    likes: [],
-    comments: [],
-  },
-];
-
 const activityMessages = [
   'Alex published a new post.',
   'Chris liked an article.',
@@ -41,39 +8,54 @@ const activityMessages = [
   'A new discussion has started.',
 ];
 
+const starterIds = ['starter-1', 'starter-2', 'starter-3'];
+
 export default function Feed({ username }) {
   const [posts, setPosts] = useState(() => {
     try {
       const saved = localStorage.getItem('kaiwaPosts');
-      const parsed = saved ? JSON.parse(saved) : starterPosts;
+      const parsed = saved ? JSON.parse(saved) : [];
 
-      return Array.isArray(parsed) ? parsed : starterPosts;
+      if (!Array.isArray(parsed)) return [];
+
+      // Remove old example posts but preserve user posts
+      return parsed.filter(
+        (post) => !starterIds.includes(post.id)
+      );
     } catch (error) {
-      console.error('Could not load saved posts:', error);
-      return starterPosts;
+      console.error('Error loading posts:', error);
+      return [];
     }
   });
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [message, setMessage] = useState('');
+
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+
   const [commentInputs, setCommentInputs] = useState({});
   const [activeComments, setActiveComments] = useState({});
+
   const [activities, setActivities] = useState([
     'Welcome to the Kaiwa community!',
   ]);
 
-  const [message, setMessage] = useState('');
-
-  // Save posts to localStorage whenever they change
+  // Persist posts in browser storage
   useEffect(() => {
     try {
-      localStorage.setItem('kaiwaPosts', JSON.stringify(posts));
+      localStorage.setItem(
+        'kaiwaPosts',
+        JSON.stringify(posts)
+      );
     } catch (error) {
-      console.error('Could not save posts:', error);
+      console.error('Error saving posts:', error);
     }
   }, [posts]);
 
-  // Simulate WebSocket activity
+  // Simulate real-time activity
   useEffect(() => {
     const interval = setInterval(() => {
       const randomMessage =
@@ -92,14 +74,8 @@ export default function Feed({ username }) {
   function handlePublish(event) {
     event.preventDefault();
 
-    console.log('Publish clicked:', {
-      username,
-      title,
-      content,
-    });
-
     if (!username) {
-      setMessage('Please log in before publishing a post.');
+      setMessage('Please log in to publish.');
       return;
     }
 
@@ -117,8 +93,6 @@ export default function Feed({ username }) {
       likes: [],
       comments: [],
     };
-
-    console.log('Creating new post:', newPost);
 
     setPosts((previous) => [newPost, ...previous]);
 
@@ -142,11 +116,11 @@ export default function Feed({ username }) {
         if (post.id !== postId) return post;
 
         const likes = post.likes || [];
-        const alreadyLiked = likes.includes(username);
+        const liked = likes.includes(username);
 
         return {
           ...post,
-          likes: alreadyLiked
+          likes: liked
             ? likes.filter((user) => user !== username)
             : [...likes, username],
         };
@@ -155,15 +129,44 @@ export default function Feed({ username }) {
   }
 
   function handleDelete(postId) {
-    if (!username) return;
-
     setPosts((previous) =>
       previous.filter(
-        (post) => post.id !== postId || post.author !== username
+        (post) =>
+          post.id !== postId || post.author !== username
       )
     );
 
-    setMessage('Your post was deleted.');
+    setMessage('Post deleted successfully.');
+  }
+
+  function startEditing(post) {
+    if (post.author !== username) return;
+
+    setEditingPostId(post.id);
+    setEditTitle(post.title);
+    setEditContent(post.content);
+  }
+
+  function saveEditedPost(postId) {
+    if (!editTitle.trim() || !editContent.trim()) {
+      setMessage('Title and content cannot be empty.');
+      return;
+    }
+
+    setPosts((previous) =>
+      previous.map((post) =>
+        post.id === postId && post.author === username
+          ? {
+              ...post,
+              title: editTitle.trim(),
+              content: editContent.trim(),
+            }
+          : post
+      )
+    );
+
+    setEditingPostId(null);
+    setMessage('Post updated successfully!');
   }
 
   function handleComment(postId) {
@@ -172,14 +175,14 @@ export default function Feed({ username }) {
       return;
     }
 
-    const commentText = commentInputs[postId]?.trim();
+    const text = commentInputs[postId]?.trim();
 
-    if (!commentText) return;
+    if (!text) return;
 
     const newComment = {
       id: crypto.randomUUID(),
       author: username,
-      text: commentText,
+      text,
     };
 
     setPosts((previous) =>
@@ -187,7 +190,10 @@ export default function Feed({ username }) {
         post.id === postId
           ? {
               ...post,
-              comments: [...(post.comments || []), newComment],
+              comments: [
+                ...(post.comments || []),
+                newComment,
+              ],
             }
           : post
       )
@@ -198,7 +204,7 @@ export default function Feed({ username }) {
       [postId]: '',
     }));
 
-    setMessage('Comment added successfully!');
+    setMessage('Comment added!');
   }
 
   function toggleComments(postId) {
@@ -227,10 +233,9 @@ export default function Feed({ username }) {
           <input
             type="text"
             id="post-title"
-            name="post-title"
-            placeholder="Enter a title."
             value={title}
             onChange={(event) => setTitle(event.target.value)}
+            placeholder="Enter a title"
             required
           />
 
@@ -241,12 +246,11 @@ export default function Feed({ username }) {
 
           <textarea
             id="post-content"
-            name="post-content"
             rows="5"
             cols="40"
-            placeholder="Share your thoughts here"
             value={content}
             onChange={(event) => setContent(event.target.value)}
+            placeholder="Share your thoughts here"
             required
           />
 
@@ -264,9 +268,7 @@ export default function Feed({ username }) {
             <p>Please log in to publish posts.</p>
           )}
 
-          {message && (
-            <p role="status">{message}</p>
-          )}
+          {message && <p role="status">{message}</p>}
         </form>
       </section>
 
@@ -282,96 +284,156 @@ export default function Feed({ username }) {
         {posts.map((post) => {
           const likes = post.likes || [];
           const comments = post.comments || [];
+          const isOwner = username && post.author === username;
 
           return (
             <article className="post" key={post.id}>
-              <h3>{post.title}</h3>
-
-              <p>Posted by {post.author}</p>
-              <p>{post.content}</p>
-
-              {post.image && (
-                <>
-                  <img
-                    src={post.image}
-                    alt="Kaiwa post illustration"
-                    width="300"
-                  />
-                  <br />
-                </>
-              )}
-
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => handleLike(post.id)}
-                disabled={!username}
-              >
-                {username && likes.includes(username)
-                  ? 'Unlike'
-                  : 'Like'} ({likes.length})
-              </button>
-
-              {' '}
-
-              <button
-                type="button"
-                className="btn btn-outline-primary"
-                onClick={() => toggleComments(post.id)}
-              >
-                Comments ({comments.length})
-              </button>
-
-              {' '}
-
-              {username && post.author === username && (
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(post.id)}
-                >
-                  Delete
-                </button>
-              )}
-
-              {activeComments[post.id] && (
+              {editingPostId === post.id ? (
                 <div>
-                  <h4>Comments</h4>
-
-                  {comments.length === 0 && (
-                    <p>No comments yet.</p>
-                  )}
-
-                  {comments.map((comment) => (
-                    <p key={comment.id}>
-                      <strong>{comment.author}:</strong>{' '}
-                      {comment.text}
-                    </p>
-                  ))}
+                  <h3>Edit Post</h3>
 
                   <input
                     type="text"
-                    placeholder="Write a comment..."
-                    value={commentInputs[post.id] || ''}
+                    value={editTitle}
                     onChange={(event) =>
-                      setCommentInputs((previous) => ({
-                        ...previous,
-                        [post.id]: event.target.value,
-                      }))
+                      setEditTitle(event.target.value)
                     }
+                    aria-label="Edit post title"
                   />
+
+                  <br /><br />
+
+                  <textarea
+                    rows="5"
+                    cols="40"
+                    value={editContent}
+                    onChange={(event) =>
+                      setEditContent(event.target.value)
+                    }
+                    aria-label="Edit post content"
+                  />
+
+                  <br /><br />
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => saveEditedPost(post.id)}
+                  >
+                    Save Changes
+                  </button>
 
                   {' '}
 
                   <button
                     type="button"
-                    className="btn btn-primary"
-                    onClick={() => handleComment(post.id)}
-                    disabled={!username}
+                    className="btn btn-outline-primary"
+                    onClick={() => setEditingPostId(null)}
                   >
-                    Add Comment
+                    Cancel
                   </button>
                 </div>
+              ) : (
+                <>
+                  <h3>{post.title}</h3>
+                  <p>Posted by {post.author}</p>
+                  <p>{post.content}</p>
+
+                  {post.image && (
+                    <img
+                      src={post.image}
+                      alt="Kaiwa post illustration"
+                      width="300"
+                    />
+                  )}
+
+                  <br />
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => handleLike(post.id)}
+                    disabled={!username}
+                  >
+                    {username && likes.includes(username)
+                      ? 'Unlike'
+                      : 'Like'} ({likes.length})
+                  </button>
+
+                  {' '}
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary"
+                    onClick={() => toggleComments(post.id)}
+                  >
+                    Comments ({comments.length})
+                  </button>
+
+                  {' '}
+
+                  {isOwner && (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary"
+                        onClick={() => startEditing(post)}
+                      >
+                        Edit
+                      </button>
+
+                      {' '}
+
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(post.id)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+
+                  {activeComments[post.id] && (
+                    <div>
+                      <h4>Comments</h4>
+
+                      {comments.length === 0 && (
+                        <p>No comments yet.</p>
+                      )}
+
+                      {comments.map((comment) => (
+                        <p key={comment.id}>
+                          <strong>{comment.author}:</strong>{' '}
+                          {comment.text}
+                        </p>
+                      ))}
+
+                      <input
+                        type="text"
+                        placeholder="Write a comment..."
+                        value={commentInputs[post.id] || ''}
+                        onChange={(event) =>
+                          setCommentInputs((previous) => ({
+                            ...previous,
+                            [post.id]: event.target.value,
+                          }))
+                        }
+                      />
+
+                      {' '}
+
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        disabled={!username}
+                        onClick={() => handleComment(post.id)}
+                      >
+                        Add Comment
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
 
               <hr />
