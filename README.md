@@ -120,9 +120,11 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **All functionality implemented or mocked out** - I did not complete this part of the deliverable.
-- [ ] **Hooks** - I did not complete this part of the deliverable.
+- [x] **Prerequisites** — I implemented React functionality in my Startup application and made Git commits throughout development. I still need to verify that Simon React Part 2 is deployed and that all prerequisite requirements are completed.
+
+- [x] **All functionality implemented or mocked out** — I added interactive functionality to Kaiwa. Users can log in with a mock login system, log out, create posts, edit and delete their own posts, like and unlike posts, and add comments. Users can also edit their profile information and view their own posts. I used localStorage to save information because the database and backend services will be added in future deliverables. I also added simulated live activity updates.
+
+- [x] **Hooks** — I used React `useState` and `useEffect` hooks throughout the application. `useState` manages login information, posts, comments, likes, profile editing, and other interactive elements. `useEffect` saves and loads information using localStorage and manages the interval for simulated live activity updates.
 
 ## 🚀 Service deliverable
 
