@@ -6,20 +6,50 @@ import Feed from './Feed.jsx';
 import Profile from './Profile.jsx';
 
 export default function App() {
-  const [username, setUsername] = useState(() => {
-    return localStorage.getItem('kaiwaUsername') || '';
-  });
+  const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (username) {
-      localStorage.setItem('kaiwaUsername', username);
-    } else {
-      localStorage.removeItem('kaiwaUsername');
-    }
-  }, [username]);
+    async function checkAuthentication() {
+      try {
+        const response = await fetch('/api/auth/me');
 
-  function handleLogout() {
-    setUsername('');
+        if (response.ok) {
+          const user = await response.json();
+          setUsername(user.email);
+        } else {
+          setUsername('');
+        }
+      } catch (error) {
+        console.error('Authentication error:', error);
+        setUsername('');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkAuthentication();
+  }, []);
+
+  async function handleLogout() {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+
+      setUsername('');
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Unable to log out. Please try again.');
+    }
+  }
+
+  if (loading) {
+    return <p>Loading Kaiwa...</p>;
   }
 
   return (

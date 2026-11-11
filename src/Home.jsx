@@ -1,33 +1,75 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Home({ username, setUsername }) {
-  const [nameInput, setNameInput] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  function handleLogin(event) {
-    event.preventDefault();
+  async function authenticate(createAccount) {
+    setError('');
 
-    if (!nameInput.trim() || !password.trim()) {
-      setError('Please enter your username and password.');
+    if (!email.trim() || !password) {
+      setError('Please enter your email and password.');
       return;
     }
 
-    setUsername(nameInput.trim());
-    setError('');
-    setPassword('');
+    setLoading(true);
 
-    navigate('/feed');
+    try {
+      if (createAccount) {
+        const registerResponse = await fetch('/api/auth/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const registerData = await registerResponse.json();
+
+        if (!registerResponse.ok) {
+          throw new Error(registerData.message);
+        }
+      }
+
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      setUsername(data.email);
+      setPassword('');
+      navigate('/feed');
+    } catch (error) {
+      setError(error.message || 'Authentication failed.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleLogin(event) {
+    event.preventDefault();
+    authenticate(false);
   }
 
   return (
     <main>
       <section>
         <h2>Welcome to Kaiwa</h2>
+
         <p>
           Kaiwa is a place to share your thoughts, publish
           articles, discover ideas, and connect with others.
@@ -58,16 +100,15 @@ export default function Home({ username, setUsername }) {
           <form onSubmit={handleLogin}>
             <h3>Login to Kaiwa</h3>
 
-            <label htmlFor="username">UserName</label>
+            <label htmlFor="email">Email</label>
             <br />
 
             <input
-              type="text"
-              id="username"
-              name="username"
-              placeholder="Enter Your UserName Here"
-              value={nameInput}
-              onChange={(event) => setNameInput(event.target.value)}
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
 
@@ -79,8 +120,7 @@ export default function Home({ username, setUsername }) {
             <input
               type="password"
               id="password"
-              name="password"
-              placeholder="Enter Your Password"
+              placeholder="Enter your password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -90,7 +130,11 @@ export default function Home({ username, setUsername }) {
 
             {error && <p role="alert">{error}</p>}
 
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
               Login
             </button>
 
@@ -99,18 +143,17 @@ export default function Home({ username, setUsername }) {
             <button
               type="button"
               className="btn btn-outline-primary"
-              onClick={() => setError(
-                'Account creation will be available in a future update.'
-              )}
+              disabled={loading}
+              onClick={() => authenticate(true)}
             >
-              Create Account (Coming soon)
+              Create Account
             </button>
 
             <br /><br />
 
             <p>
-              Demo login: enter any username and password.
-              No real authentication is performed.
+              New to Kaiwa? Create an account to publish
+              posts and connect with others.
             </p>
           </form>
         )}
