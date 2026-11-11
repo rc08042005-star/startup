@@ -102,6 +102,53 @@ app.post('/api/auth/login', async (req, res) => {
     });
   }
 });
+// Verify authentication token
+function verifyAuth(req, res, next) {
+  const token = req.cookies.token;
+  const userId = authTokens.get(token);
+
+  if (!userId) {
+    return res.status(401).json({
+      message: 'Unauthorized',
+    });
+  }
+
+  const user = [...users.values()].find(
+    (user) => user.id === userId
+  );
+
+  if (!user) {
+    return res.status(401).json({
+      message: 'User not found',
+    });
+  }
+
+  req.user = user;
+  next();
+}
+
+// Get currently authenticated user
+app.get('/api/auth/me', verifyAuth, (req, res) => {
+  res.json({
+    id: req.user.id,
+    email: req.user.email,
+  });
+});
+
+// Logout
+app.delete('/api/auth/logout', (req, res) => {
+  const token = req.cookies.token;
+
+  authTokens.delete(token);
+
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  res.status(204).send();
+});
 app.use(express.static('public'));
 
 app.listen(port, () => {
