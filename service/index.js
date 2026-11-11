@@ -61,6 +61,47 @@ app.post('/api/auth/create', async (req, res) => {
     });
   }
 });
+const authTokens = new Map();
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({
+        message: 'Email and password are required',
+      });
+    }
+
+    const user = users.get(email.trim().toLowerCase());
+
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+      return res.status(401).json({
+        message: 'Invalid email or password',
+      });
+    }
+
+    const token = randomUUID();
+    authTokens.set(token, user.id);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
+    res.json({
+      id: user.id,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      message: 'Unable to log in',
+    });
+  }
+});
 app.use(express.static('public'));
 
 app.listen(port, () => {
