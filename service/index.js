@@ -148,7 +148,160 @@ app.delete('/api/auth/logout', (req, res) => {
   });
 
   res.status(204).send();
+});// Temporary post storage
+const posts = [];
+
+// Retrieve all posts
+app.get('/api/posts', (req, res) => {
+  res.json(posts);
 });
+
+// Create a new post
+app.post('/api/posts', verifyAuth, (req, res) => {
+  const { title, content } = req.body;
+
+  if (
+    typeof title !== 'string' ||
+    typeof content !== 'string' ||
+    !title.trim() ||
+    !content.trim()
+  ) {
+    return res.status(400).json({
+      message: 'Title and content are required',
+    });
+  }
+
+  const newPost = {
+    id: randomUUID(),
+    title: title.trim(),
+    content: content.trim(),
+    author: req.user.email,
+    image: '',
+    likes: [],
+    comments: [],
+  };
+
+  posts.unshift(newPost);
+
+  res.status(201).json(newPost);
+});
+
+// Edit an existing post
+app.put('/api/posts/:id', verifyAuth, (req, res) => {
+  const post = posts.find(
+    (post) => post.id === req.params.id
+  );
+
+  if (!post) {
+    return res.status(404).json({
+      message: 'Post not found',
+    });
+  }
+
+  if (post.author !== req.user.email) {
+    return res.status(403).json({
+      message: 'You can only edit your own posts',
+    });
+  }
+
+  const { title, content } = req.body;
+
+  if (
+    typeof title !== 'string' ||
+    typeof content !== 'string' ||
+    !title.trim() ||
+    !content.trim()
+  ) {
+    return res.status(400).json({
+      message: 'Title and content are required',
+    });
+  }
+
+  post.title = title.trim();
+  post.content = content.trim();
+
+  res.json(post);
+});
+
+// Delete a post
+app.delete('/api/posts/:id', verifyAuth, (req, res) => {
+  const index = posts.findIndex(
+    (post) => post.id === req.params.id
+  );
+
+  if (index === -1) {
+    return res.status(404).json({
+      message: 'Post not found',
+    });
+  }
+
+  if (posts[index].author !== req.user.email) {
+    return res.status(403).json({
+      message: 'You can only delete your own posts',
+    });
+  }
+
+  posts.splice(index, 1);
+
+  res.status(204).send();
+});
+
+// Like or unlike a post
+app.post('/api/posts/:id/like', verifyAuth, (req, res) => {
+  const post = posts.find(
+    (post) => post.id === req.params.id
+  );
+
+  if (!post) {
+    return res.status(404).json({
+      message: 'Post not found',
+    });
+  }
+
+  const email = req.user.email;
+
+  if (post.likes.includes(email)) {
+    post.likes = post.likes.filter(
+      (user) => user !== email
+    );
+  } else {
+    post.likes.push(email);
+  }
+
+  res.json(post);
+});
+
+// Add a comment
+app.post('/api/posts/:id/comment', verifyAuth, (req, res) => {
+  const post = posts.find(
+    (post) => post.id === req.params.id
+  );
+
+  if (!post) {
+    return res.status(404).json({
+      message: 'Post not found',
+    });
+  }
+
+  const { text } = req.body;
+
+  if (typeof text !== 'string' || !text.trim()) {
+    return res.status(400).json({
+      message: 'Comment cannot be empty',
+    });
+  }
+
+  const comment = {
+    id: randomUUID(),
+    author: req.user.email,
+    text: text.trim(),
+  };
+
+  post.comments.push(comment);
+
+  res.json(post);
+});
+
 app.use(express.static('public'));
 
 app.listen(port, () => {
