@@ -8,26 +8,23 @@ const activityMessages = [
   'A new discussion has started.',
 ];
 
-const starterIds = ['starter-1', 'starter-2', 'starter-3'];
+async function apiRequest(path, options = {}) {
+  const response = await fetch(path, options);
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.message || 'Request failed');
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
 
 export default function Feed({ username }) {
-  const [posts, setPosts] = useState(() => {
-    try {
-      const saved = localStorage.getItem('kaiwaPosts');
-      const parsed = saved ? JSON.parse(saved) : [];
-
-      if (!Array.isArray(parsed)) return [];
-
-      // Remove old example posts but preserve user posts
-      return parsed.filter(
-        (post) => !starterIds.includes(post.id)
-      );
-    } catch (error) {
-      console.error('Error loading posts:', error);
-      return [];
-    }
-  });
-
+  const [posts, setPosts] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [message, setMessage] = useState('');
@@ -43,17 +40,12 @@ export default function Feed({ username }) {
     'Welcome to the Kaiwa community!',
   ]);
 
-  // Persist posts in browser storage
+  // Load posts from the Express backend
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        'kaiwaPosts',
-        JSON.stringify(posts)
-      );
-    } catch (error) {
-      console.error('Error saving posts:', error);
-    }
-  }, [posts]);
+    apiRequest('/api/posts')
+      .then((data) => setPosts(data))
+      .catch((error) => setMessage(error.message));
+  }, []);
 
   // Simulate real-time activity
   useEffect(() => {
@@ -71,7 +63,7 @@ export default function Feed({ username }) {
     return () => clearInterval(interval);
   }, []);
 
-  function handlePublish(event) {
+  async function handlePublish(event) {
     event.preventDefault();
 
     if (!username) {
@@ -84,59 +76,68 @@ export default function Feed({ username }) {
       return;
     }
 
-    const newPost = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      author: username,
-      content: content.trim(),
-      image: '',
-      likes: [],
-      comments: [],
-    };
+    try {
+      const newPost = await apiRequest('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, content }),
+      });
 
-    setPosts((previous) => [newPost, ...previous]);
+      setPosts((previous) => [newPost, ...previous]);
 
-    setTitle('');
-    setContent('');
-    setMessage('Your post was published successfully!');
+      setTitle('');
+      setContent('');
+      setMessage('Your post was published successfully!');
 
-    setActivities((previous) =>
-      [`${username} published a new post.`, ...previous].slice(0, 5)
-    );
+      setActivities((previous) =>
+        [`${username} published a new post.`, ...previous]
+          .slice(0, 5)
+      );
+    } catch (error) {
+      setMessage(error.message);
+    }
   }
 
-  function handleLike(postId) {
+  async function handleLike(postId) {
     if (!username) {
       setMessage('Please log in to like posts.');
       return;
     }
 
-    setPosts((previous) =>
-      previous.map((post) => {
-        if (post.id !== postId) return post;
+    try {
+      const updatedPost = await apiRequest(
+        `/api/posts/${postId}/like`,
+        {
+          method: 'POST',
+        }
+      );
 
-        const likes = post.likes || [];
-        const liked = likes.includes(username);
-
-        return {
-          ...post,
-          likes: liked
-            ? likes.filter((user) => user !== username)
-            : [...likes, username],
-        };
-      })
-    );
+      setPosts((previous) =>
+        previous.map((post) =>
+          post.id === postId ? updatedPost : post
+        )
+      );
+    } catch (error) {
+      setMessage(error.message);
+    }
   }
 
-  function handleDelete(postId) {
-    setPosts((previous) =>
-      previous.filter(
-        (post) =>
-          post.id !== postId || post.author !== username
-      )
-    );
+  async function handleDelete(postId) {
+    try {
+      await apiRequest(`/api/posts/${postId}`, {
+        method: 'DELETE',
+      });
 
-    setMessage('Post deleted successfully.');
+      setPosts((previous) =>
+        previous.filter((post) => post.id !== postId)
+      );
+
+      setMessage('Post deleted successfully.');
+    } catch (error) {
+      setMessage(error.message);
+    }
   }
 
   function startEditing(post) {
@@ -147,29 +148,41 @@ export default function Feed({ username }) {
     setEditContent(post.content);
   }
 
-  function saveEditedPost(postId) {
+  async function saveEditedPost(postId) {
     if (!editTitle.trim() || !editContent.trim()) {
       setMessage('Title and content cannot be empty.');
       return;
     }
 
-    setPosts((previous) =>
-      previous.map((post) =>
-        post.id === postId && post.author === username
-          ? {
-              ...post,
-              title: editTitle.trim(),
-              content: editContent.trim(),
-            }
-          : post
-      )
-    );
+    try {
+      const updatedPost = await apiRequest(
+        `/api/posts/${postId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: editTitle,
+            content: editContent,
+          }),
+        }
+      );
 
-    setEditingPostId(null);
-    setMessage('Post updated successfully!');
+      setPosts((previous) =>
+        previous.map((post) =>
+          post.id === postId ? updatedPost : post
+        )
+      );
+
+      setEditingPostId(null);
+      setMessage('Post updated successfully!');
+    } catch (error) {
+      setMessage(error.message);
+    }
   }
 
-  function handleComment(postId) {
+  async function handleComment(postId) {
     if (!username) {
       setMessage('Please log in to comment.');
       return;
@@ -177,34 +190,38 @@ export default function Feed({ username }) {
 
     const text = commentInputs[postId]?.trim();
 
-    if (!text) return;
+    if (!text) {
+      setMessage('Please enter a comment.');
+      return;
+    }
 
-    const newComment = {
-      id: crypto.randomUUID(),
-      author: username,
-      text,
-    };
+    try {
+      const updatedPost = await apiRequest(
+        `/api/posts/${postId}/comment`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
 
-    setPosts((previous) =>
-      previous.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              comments: [
-                ...(post.comments || []),
-                newComment,
-              ],
-            }
-          : post
-      )
-    );
+      setPosts((previous) =>
+        previous.map((post) =>
+          post.id === postId ? updatedPost : post
+        )
+      );
 
-    setCommentInputs((previous) => ({
-      ...previous,
-      [postId]: '',
-    }));
+      setCommentInputs((previous) => ({
+        ...previous,
+        [postId]: '',
+      }));
 
-    setMessage('Comment added!');
+      setMessage('Comment added!');
+    } catch (error) {
+      setMessage(error.message);
+    }
   }
 
   function toggleComments(postId) {
