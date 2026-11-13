@@ -304,7 +304,22 @@ app.post('/api/posts/:id/comment', verifyAuth, (req, res) => {
 
 app.use(express.static('public'));
 
-app.listen(port, () => {
- 
-console.log(`Kaiwa service listening on port ${port}`);
+const path = require('path');
+
+// Serve the React production build
+const publicPath = path.join(__dirname, 'public');
+
+app.use(express.static(publicPath));
+
+// Return the React app for frontend routes
+app.get('/{*path}', (req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
+
+app.listen(port, () => {
+  console.log(`Kaiwa service listening on port ${port}`);
+});;
