@@ -125,19 +125,25 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **All functionality implemented or mocked out** — I added interactive functionality to Kaiwa. Users can log in with a mock login system, log out, create posts, edit and delete their own posts, like and unlike posts, and add comments. Users can also edit their profile information and view their own posts. I used localStorage to save information because the database and backend services will be added in future deliverables. I also added simulated live activity updates.
 
 - [x] **Hooks** — I used React `useState` and `useEffect` hooks throughout the application. `useState` manages login information, posts, comments, likes, profile editing, and other interactive elements. `useEffect` saves and loads information using localStorage and manages the interval for simulated live activity updates.
-
 ## 🚀 Service deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Node.js/Express HTTP service** - I did not complete this part of the deliverable.
-- [ ] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [ ] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [ ] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
-- [ ] **Uses BCrypt to hash passwords** - I did not complete this part of the deliverable.
+[x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits) - I deployed Simon and pushed my startup project to GitHub with multiple commits.
+
+[x] **Node.js/Express HTTP service** - I created a backend using Node.js and Express and deployed it to AWS.
+
+[x] **Static middleware for frontend** - I used Express static middleware to serve my React frontend and made sure pages work after refreshing.
+
+[x] **Calls to third party endpoints** - I connected the DummyJSON Quotes API to display random quotes on my Feed page.
+
+[x] **Backend service endpoints** - I created endpoints for managing posts, likes, comments, and user accounts.
+
+[x] **Frontend calls service endpoints** - I used fetch requests to connect my React frontend to the backend.
+
+[x] **Supports registration, login, logout, and restricted endpoint** - I implemented user registration, login, logout, and protected endpoints that require authentication.
+
+[x] **Uses BCrypt to hash passwords** - I used bcryptjs to hash passwords during registration and verify them during login.
 
 ## 🚀 DB deliverable
 
