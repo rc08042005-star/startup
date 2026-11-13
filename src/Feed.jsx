@@ -29,6 +29,9 @@ export default function Feed({ username }) {
   const [content, setContent] = useState('');
   const [message, setMessage] = useState('');
 
+  const [dailyQuote, setDailyQuote] = useState(null);
+  const [quoteError, setQuoteError] = useState(false);
+
   const [editingPostId, setEditingPostId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
@@ -45,6 +48,29 @@ export default function Feed({ username }) {
     apiRequest('/api/posts')
       .then((data) => setPosts(data))
       .catch((error) => setMessage(error.message));
+  }, []);
+
+  // Load a random quote from a third-party API
+  useEffect(() => {
+    async function fetchQuote() {
+      try {
+        const response = await fetch(
+          'https://dummyjson.com/quotes/random'
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch quote');
+        }
+
+        const data = await response.json();
+        setDailyQuote(data);
+      } catch (error) {
+        console.error('Quote API error:', error);
+        setQuoteError(true);
+      }
+    }
+
+    fetchQuote();
   }, []);
 
   // Simulate real-time activity
@@ -213,10 +239,12 @@ export default function Feed({ username }) {
         )
       );
 
-      setCommentInputs((previous) => ({
-        ...previous,
-        [postId]: '',
-      }));
+      setCommentInputs((previous) =>
+        previous.map ? previous : {
+          ...previous,
+          [postId]: '',
+        }
+      );
 
       setMessage('Comment added!');
     } catch (error) {
@@ -256,7 +284,8 @@ export default function Feed({ username }) {
             required
           />
 
-          <br /><br />
+          <br />
+          <br />
 
           <label htmlFor="post-content">Post Content</label>
           <br />
@@ -271,7 +300,8 @@ export default function Feed({ username }) {
             required
           />
 
-          <br /><br />
+          <br />
+          <br />
 
           <button
             type="submit"
@@ -301,7 +331,8 @@ export default function Feed({ username }) {
         {posts.map((post) => {
           const likes = post.likes || [];
           const comments = post.comments || [];
-          const isOwner = username && post.author === username;
+          const isOwner =
+            username && post.author === username;
 
           return (
             <article className="post" key={post.id}>
@@ -318,7 +349,8 @@ export default function Feed({ username }) {
                     aria-label="Edit post title"
                   />
 
-                  <br /><br />
+                  <br />
+                  <br />
 
                   <textarea
                     rows="5"
@@ -330,7 +362,8 @@ export default function Feed({ username }) {
                     aria-label="Edit post content"
                   />
 
-                  <br /><br />
+                  <br />
+                  <br />
 
                   <button
                     type="button"
@@ -462,14 +495,16 @@ export default function Feed({ username }) {
       <section>
         <h2>Daily Quote</h2>
 
-        <blockquote>
-          "Every great project is built on a small idea"
-        </blockquote>
-
-        <p>
-          This is a mock quote. A third-party API will
-          provide quotes in a future deliverable.
-        </p>
+        {dailyQuote ? (
+          <blockquote>
+            <p>"{dailyQuote.quote}"</p>
+            <footer>— {dailyQuote.author}</footer>
+          </blockquote>
+        ) : quoteError ? (
+          <p>Unable to load today's quote.</p>
+        ) : (
+          <p>Loading quote...</p>
+        )}
       </section>
 
       <hr />
