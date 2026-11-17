@@ -147,11 +147,21 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ## 🚀 DB deliverable
 
-For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
+## Startup DB Deliverable
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Stores data in MongoDB** - I did not complete this part of the deliverable.
-- [ ] **Stores credentials in MongoDB** - I did not complete this part of the deliverable.
+### MongoDB Atlas Setup
+- Created a MongoDB Atlas cluster.
+- Configured a database user for authentication.
+- Added my development IP address to the access list.
+- Cloned the Simon DB repository.
+- Installed the required Simon DB dependencies.
+
+### Work Remaining
+- Connect the backend to MongoDB.
+- Store user credentials securely in MongoDB.
+- Store and retrieve Kaiwa posts from MongoDB.
+- Test authentication and database persistence.
+- Deploy Simon DB and the updated Kaiwa application.
 
 ## 🚀 WebSocket deliverable
 
