@@ -42,3 +42,28 @@ Used element, class, ID, and pseudo selectors.
 - Used the browser to test the functionality and fixed issues with displaying posts.
 - Successfully ran `npm run build` to create a production build of Kaiwa.
 - Continued using Git to commit and push my React changes to GitHub.
+
+## Service Deliverable
+
+For this deliverable, I added a backend service to my Kaiwa startup using Node.js and Express. The backend handles user registration, login, logout, authentication, and posts.
+
+I created API endpoints that allow users to create, view, edit, and delete posts. Users can also like posts and add comments. The React frontend communicates with the backend using fetch requests.
+
+I also integrated a third-party API from DummyJSON to display random quotes in the Daily Quote section of the Feed page.
+
+I deployed the frontend and backend to my AWS server using Caddy and PM2. The application is available at https://startup.kaiwa.click.
+
+I tested the deployed website and confirmed that registration, login, creating posts, liking, commenting, displaying quotes, and refreshing the Feed page work correctly.
+
+Currently, user accounts and posts are stored in memory. This means the data is reset when the backend restarts. Persistent database storage will be added in a future deliverable.
+
+
+## Startup DB - MongoDB Setup
+
+- Cloned the Simon DB repository.
+- Installed Simon DB dependencies using npm install.
+- Created a MongoDB Atlas cluster.
+- Verified the MongoDB database user.
+- Configured MongoDB Atlas network access.
+- Learned that MongoDB Atlas uses IP access lists
+  to control database connections.
