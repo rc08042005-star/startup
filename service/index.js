@@ -1,25 +1,92 @@
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+const { randomUUID } = require('crypto');
+const path = require('path');
+
+const { connectDB } = require('./database');
+const {
+  users,
+  posts,
+  sessions,
+  initializeDatabase,
+} = require('./dbOperations');
 
 const app = express();
-
-const port = process.argv.length > 2 ? process.argv[2] : 4000;
+const port = process.argv[2] || 4000;
+const sessionDuration = 7 * 24 * 60 * 60 * 1000;
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.get('/api/health', (req, res) => {
-  res.json({ message: 'Kaiwa backend is running!' });
-});
-const bcrypt = require('bcryptjs');
-const { randomUUID } = require('crypto');
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'strict',
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: sessionDuration,
+};
 
-// Temporary in-memory user storage
-const users = new Map();
+function publicUser(user) {
+  return { id: user.id, email: user.email };
+}
 
-app.post('/api/auth/create', async (req, res) => {
+function publicPost(post) {
+  if (!post) return null;
+  const { _id, ...result } = post;
+  return result;
+}
+
+// Check whether a user is logged in
+async function verifyAuth(req, res, next) {
   try {
-    const { email, password } = req.body;
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+      });
+    }
+
+    const session = await sessions().findOne({
+      token,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!session) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+      });
+    }
+
+    const user = await users().findOne({
+      id: session.userId,
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        message: 'User not found',
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    message: 'Kaiwa backend is running!',
+  });
+});
+
+// Register a new user
+app.post('/api/auth/create', async (req, res, next) => {
+  try {
+    const { email, password } = req.body || {};
 
     if (
       typeof email !== 'string' ||
@@ -34,284 +101,294 @@ app.post('/api/auth/create', async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    if (users.has(normalizedEmail)) {
-      return res.status(409).json({
-        message: 'User already exists',
-      });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
     const user = {
       id: randomUUID(),
       email: normalizedEmail,
-      passwordHash,
+      passwordHash: await bcrypt.hash(password, 10),
     };
 
-    users.set(normalizedEmail, user);
+    try {
+      await users().insertOne(user);
+    } catch (error) {
+      if (error.code === 11000) {
+        return res.status(409).json({
+          message: 'User already exists',
+        });
+      }
+      throw error;
+    }
 
-    res.status(201).json({
-      id: user.id,
-      email: user.email,
-    });
+    res.status(201).json(publicUser(user));
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({
-      message: 'Unable to register user',
-    });
+    next(error);
   }
 });
-const authTokens = new Map();
 
-app.post('/api/auth/login', async (req, res) => {
+// Login
+app.post('/api/auth/login', async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    if (typeof email !== 'string' || typeof password !== 'string') {
+    if (
+      typeof email !== 'string' ||
+      typeof password !== 'string'
+    ) {
       return res.status(400).json({
         message: 'Email and password are required',
       });
     }
 
-    const user = users.get(email.trim().toLowerCase());
+    const user = await users().findOne({
+      email: email.trim().toLowerCase(),
+    });
 
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    if (
+      !user ||
+      !(await bcrypt.compare(password, user.passwordHash))
+    ) {
       return res.status(401).json({
         message: 'Invalid email or password',
       });
     }
 
     const token = randomUUID();
-    authTokens.set(token, user.id);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+    await sessions().insertOne({
+      token,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + sessionDuration),
     });
 
-    res.json({
-      id: user.id,
-      email: user.email,
-    });
+    res.cookie('token', token, cookieOptions);
+    res.json(publicUser(user));
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      message: 'Unable to log in',
-    });
+    next(error);
   }
 });
-// Verify authentication token
-function verifyAuth(req, res, next) {
-  const token = req.cookies.token;
-  const userId = authTokens.get(token);
 
-  if (!userId) {
-    return res.status(401).json({
-      message: 'Unauthorized',
-    });
-  }
-
-  const user = [...users.values()].find(
-    (user) => user.id === userId
-  );
-
-  if (!user) {
-    return res.status(401).json({
-      message: 'User not found',
-    });
-  }
-
-  req.user = user;
-  next();
-}
-
-// Get currently authenticated user
+// Get currently logged-in user
 app.get('/api/auth/me', verifyAuth, (req, res) => {
-  res.json({
-    id: req.user.id,
-    email: req.user.email,
-  });
+  res.json(publicUser(req.user));
 });
 
 // Logout
-app.delete('/api/auth/logout', (req, res) => {
-  const token = req.cookies.token;
+app.delete('/api/auth/logout', async (req, res, next) => {
+  try {
+    if (req.cookies.token) {
+      await sessions().deleteOne({
+        token: req.cookies.token,
+      });
+    }
 
-  authTokens.delete(token);
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    });
 
-  res.clearCookie('token', {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-  });
-
-  res.status(204).send();
-});// Temporary post storage
-const posts = [];
-
-// Retrieve all posts
-app.get('/api/posts', (req, res) => {
-  res.json(posts);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
 });
 
-// Create a new post
-app.post('/api/posts', verifyAuth, (req, res) => {
-  const { title, content } = req.body;
+// Retrieve all posts
+app.get('/api/posts', async (req, res, next) => {
+  try {
+    const results = await posts()
+      .find()
+      .sort({ _id: -1 })
+      .toArray();
 
-  if (
-    typeof title !== 'string' ||
-    typeof content !== 'string' ||
-    !title.trim() ||
-    !content.trim()
-  ) {
-    return res.status(400).json({
-      message: 'Title and content are required',
-    });
+    res.json(results.map(publicPost));
+  } catch (error) {
+    next(error);
   }
+});
 
-  const newPost = {
-    id: randomUUID(),
-    title: title.trim(),
-    content: content.trim(),
-    author: req.user.email,
-    image: '',
-    likes: [],
-    comments: [],
-  };
+// Create a post
+app.post('/api/posts', verifyAuth, async (req, res, next) => {
+  try {
+    const { title, content } = req.body || {};
 
-  posts.unshift(newPost);
+    if (
+      typeof title !== 'string' ||
+      typeof content !== 'string' ||
+      !title.trim() ||
+      !content.trim()
+    ) {
+      return res.status(400).json({
+        message: 'Title and content are required',
+      });
+    }
 
-  res.status(201).json(newPost);
+    const post = {
+      id: randomUUID(),
+      title: title.trim(),
+      content: content.trim(),
+      author: req.user.email,
+      image: '',
+      likes: [],
+      comments: [],
+      createdAt: new Date(),
+    };
+
+    await posts().insertOne(post);
+
+    res.status(201).json(publicPost(post));
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Edit an existing post
-app.put('/api/posts/:id', verifyAuth, (req, res) => {
-  const post = posts.find(
-    (post) => post.id === req.params.id
-  );
+app.put('/api/posts/:id', verifyAuth, async (req, res, next) => {
+  try {
+    const { title, content } = req.body || {};
 
-  if (!post) {
-    return res.status(404).json({
-      message: 'Post not found',
-    });
+    if (
+      typeof title !== 'string' ||
+      typeof content !== 'string' ||
+      !title.trim() ||
+      !content.trim()
+    ) {
+      return res.status(400).json({
+        message: 'Title and content are required',
+      });
+    }
+
+    const result = await posts().findOneAndUpdate(
+      {
+        id: req.params.id,
+        author: req.user.email,
+      },
+      {
+        $set: {
+          title: title.trim(),
+          content: content.trim(),
+        },
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!result) {
+      const exists = await posts().findOne({
+        id: req.params.id,
+      });
+
+      return res.status(exists ? 403 : 404).json({
+        message: exists
+          ? 'You can only edit your own posts'
+          : 'Post not found',
+      });
+    }
+
+    res.json(publicPost(result));
+  } catch (error) {
+    next(error);
   }
-
-  if (post.author !== req.user.email) {
-    return res.status(403).json({
-      message: 'You can only edit your own posts',
-    });
-  }
-
-  const { title, content } = req.body;
-
-  if (
-    typeof title !== 'string' ||
-    typeof content !== 'string' ||
-    !title.trim() ||
-    !content.trim()
-  ) {
-    return res.status(400).json({
-      message: 'Title and content are required',
-    });
-  }
-
-  post.title = title.trim();
-  post.content = content.trim();
-
-  res.json(post);
 });
 
 // Delete a post
-app.delete('/api/posts/:id', verifyAuth, (req, res) => {
-  const index = posts.findIndex(
-    (post) => post.id === req.params.id
-  );
-
-  if (index === -1) {
-    return res.status(404).json({
-      message: 'Post not found',
+app.delete('/api/posts/:id', verifyAuth, async (req, res, next) => {
+  try {
+    const result = await posts().deleteOne({
+      id: req.params.id,
+      author: req.user.email,
     });
+
+    if (!result.deletedCount) {
+      const exists = await posts().findOne({
+        id: req.params.id,
+      });
+
+      return res.status(exists ? 403 : 404).json({
+        message: exists
+          ? 'You can only delete your own posts'
+          : 'Post not found',
+      });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
   }
-
-  if (posts[index].author !== req.user.email) {
-    return res.status(403).json({
-      message: 'You can only delete your own posts',
-    });
-  }
-
-  posts.splice(index, 1);
-
-  res.status(204).send();
 });
 
 // Like or unlike a post
-app.post('/api/posts/:id/like', verifyAuth, (req, res) => {
-  const post = posts.find(
-    (post) => post.id === req.params.id
-  );
+app.post('/api/posts/:id/like', verifyAuth, async (req, res, next) => {
+  try {
+    const email = req.user.email;
+    const filter = { id: req.params.id };
 
-  if (!post) {
-    return res.status(404).json({
-      message: 'Post not found',
-    });
-  }
-
-  const email = req.user.email;
-
-  if (post.likes.includes(email)) {
-    post.likes = post.likes.filter(
-      (user) => user !== email
+    const unlike = await posts().findOneAndUpdate(
+      { ...filter, likes: email },
+      { $pull: { likes: email } },
+      { returnDocument: 'after' }
     );
-  } else {
-    post.likes.push(email);
-  }
 
-  res.json(post);
+    if (unlike) {
+      return res.json(publicPost(unlike));
+    }
+
+    const liked = await posts().findOneAndUpdate(
+      { ...filter, likes: { $ne: email } },
+      { $addToSet: { likes: email } },
+      { returnDocument: 'after' }
+    );
+
+    if (!liked) {
+      return res.status(404).json({
+        message: 'Post not found',
+      });
+    }
+
+    res.json(publicPost(liked));
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Add a comment
-app.post('/api/posts/:id/comment', verifyAuth, (req, res) => {
-  const post = posts.find(
-    (post) => post.id === req.params.id
-  );
+app.post('/api/posts/:id/comment', verifyAuth, async (req, res, next) => {
+  try {
+    const { text } = req.body || {};
 
-  if (!post) {
-    return res.status(404).json({
-      message: 'Post not found',
-    });
+    if (typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({
+        message: 'Comment cannot be empty',
+      });
+    }
+
+    const comment = {
+      id: randomUUID(),
+      author: req.user.email,
+      text: text.trim(),
+    };
+
+    const result = await posts().findOneAndUpdate(
+      { id: req.params.id },
+      { $push: { comments: comment } },
+      { returnDocument: 'after' }
+    );
+
+    if (!result) {
+      return res.status(404).json({
+        message: 'Post not found',
+      });
+    }
+
+    res.json(publicPost(result));
+  } catch (error) {
+    next(error);
   }
-
-  const { text } = req.body;
-
-  if (typeof text !== 'string' || !text.trim()) {
-    return res.status(400).json({
-      message: 'Comment cannot be empty',
-    });
-  }
-
-  const comment = {
-    id: randomUUID(),
-    author: req.user.email,
-    text: text.trim(),
-  };
-
-  post.comments.push(comment);
-
-  res.json(post);
 });
 
-app.use(express.static('public'));
-
-const path = require('path');
-
-// Serve the React production build
+// Serve React production files
 const publicPath = path.join(__dirname, 'public');
 
 app.use(express.static(publicPath));
 
-// Return the React app for frontend routes
 app.get('/{*path}', (req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return next();
@@ -320,6 +397,30 @@ app.get('/{*path}', (req, res, next) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`Kaiwa service listening on port ${port}`);
-});;
+// Handle errors
+app.use((error, req, res, next) => {
+  console.error('Kaiwa service error:', error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  res.status(500).json({
+    message: 'Internal server error',
+  });
+});
+
+// Connect to MongoDB before starting server
+async function startServer() {
+  await connectDB();
+  await initializeDatabase();
+
+  app.listen(port, () => {
+    console.log(`Kaiwa service listening on port ${port}`);
+  });
+}
+
+startServer().catch((error) => {
+  console.error('Unable to start Kaiwa:', error.message);
+  process.exit(1);
+});
