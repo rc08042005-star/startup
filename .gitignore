@@ -27,3 +27,7 @@ kaiwa/
 node_modules/
 .env
 *.pem
+
+# MongoDB credentials
+**/dbConfig.json
+.env.*
