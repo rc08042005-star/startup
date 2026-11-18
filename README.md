@@ -147,21 +147,35 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ## 🚀 DB deliverable
 
-## Startup DB Deliverable
+### 🚀 DB deliverable
 
-### MongoDB Atlas Setup
-- Created a MongoDB Atlas cluster.
-- Configured a database user for authentication.
-- Added my development IP address to the access list.
-- Cloned the Simon DB repository.
-- Installed the required Simon DB dependencies.
+For this deliverable, I completed the following:
 
-### Work Remaining
-- Connect the backend to MongoDB.
-- Store user credentials securely in MongoDB.
-- Store and retrieve Kaiwa posts from MongoDB.
-- Test authentication and database persistence.
-- Deploy Simon DB and the updated Kaiwa application.
+✓ **Prerequisites:** I deployed Simon DB to https://simon.kaiwa.click and tested registration and login. I also pushed my Startup project to GitHub with multiple commits.
+
+✓ **MongoDB Atlas:** I created a MongoDB Atlas database and connected it to my Kaiwa backend.
+
+✓ **Stores application data in MongoDB:** I updated my backend to store posts, likes, and comments in MongoDB. The information stays saved even after restarting the server.
+
+✓ **Stores and retrieves credentials in MongoDB:** I implemented user registration and login using MongoDB to store and retrieve user account information.
+
+✓ **Password security:** I used bcryptjs to hash user passwords before storing them in the database.
+
+✓ **Authentication and authorization:** I implemented login, logout, and protected endpoints. Users can create posts, but only the original author can edit or delete their posts.
+
+✓ **Database integration:** I added `database.js` and `dbOperations.js` to manage MongoDB connections and database operations.
+
+✓ **Database configuration:** I stored my MongoDB credentials in `dbConfig.json` and excluded this file from GitHub for security.
+
+✓ **Testing:** I tested user registration, login, posts, likes, comments, and database persistence after restarting the backend.
+
+✓ **Deployment:** I deployed my updated Kaiwa application to https://startup.kaiwa.click.
+
+### What I learned
+
+During this deliverable, I learned how to connect a Node.js and Express backend to MongoDB Atlas. I also learned how to store user information securely, retrieve data from a database, and use authentication to control what users can do.
+
+Using MongoDB helped me understand how a real application can save information permanently instead of losing everything when the server restarts.
 
 ## 🚀 WebSocket deliverable
 
