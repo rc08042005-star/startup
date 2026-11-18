@@ -31,3 +31,4 @@ node_modules/
 # MongoDB credentials
 **/dbConfig.json
 .env.*
+service/index.backup.js
